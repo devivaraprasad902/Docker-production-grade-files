@@ -1,0 +1,83 @@
+Production grade docker files
+--------------------------------
+NODE
+-----------------------------------
+FROM node:24-alpine
+WORKDIR /mynodeapp
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+RUN chown -R node:node /mynodeapp
+USER node
+EXPOSE 80
+CMD ["node", "index.js"]
+-------------------------------------
+
+Python
+---------------------
+FROM python:3-alpine
+WORKDIR /myapp
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+RUN adduser -D python
+COPY --chown=python:python . .
+USER python
+EXPOSE 8000
+CMD ["python", "app.py"]
+
+----------------------------------------
+
+Nginx
+---------------------------------------
+FROM nginx:alpine
+EXPOSE 80
+Run rm -rf  /usr/share/nginx/html/*
+COPY index.html /usr/share/nginx/html
+RUN chown nginx:nginx /usr/share/nginx/html
+USER nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+--------------------------------------------
+HTTPD
+-------------------------------
+from httpd:2.4-alpine
+EXPOSE 80
+RUN rm -rf /usr/local/apache2/htdocs/*
+copy index.html /usr/local/apache2/htdocs/
+RUN chown -R daemon:daemon /usr/local/apache2/htdocs/
+USER daemon
+CMD ["httpd-foreground"]
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+NOn--Production grade docker files
+-----------------------------------------
+how to run python app
+---------------------
+code
+python & pip install (pip install means like we are using mvn clean install for java likewise pip install for python) cmd to install yum install python-pip -y
+pip install -r requirements.txt (r means recursive)
+python app.py
+
+FROM python
+WORKDIR myapp
+COPY requirements.txt .
+run pip install -r requirements.txt
+COPY . .
+CMD ["python", "app.py"]
+EXPOSE 8000
+------------------------------------
+how to run node js app
+code 
+node js install
+npm install (Dependencies will install) 
+node app.js / npm start (for running the app)
+
+note: package.json (like pom.xml, req.tx)
+----------------------------------------------
+FROM node
+WORKDIR myNode
+COPY package.json .
+RUN  npm install
+COPY . .
+CMD ["node","index.js"]
+EXPOSE 80
